@@ -10,7 +10,8 @@ ljmp main
 
 ORG 200H 
 
-lcdwrite:	  mov a,#80h		 ;Put cursor on first row,5 column
+;-------------------------writing to the LCD routine---------------------------------------
+lcdwrite: mov a,#80h		 ;Put cursor on first row,5 column
 	  acall lcd_command	 ;send command to LCD
 	  acall delay
 	  mov   dptr,#my_string1   ;Load DPTR with string1 Address
@@ -107,21 +108,20 @@ loop2:	 mov r1,#255
 ;------------- ROM text strings---------------------------------------------------------------
 org 300h
 my_string1:
-         DB   "Pt-51", 00H
-my_string2:
-		 DB   "IIT Bombay", 00H
+         DB   "New Action", 00H
 end
 
 
 
-
+;--------------------------------------readnibble---------------------------------------------
 readnibble: 
           mov p1,#0fh ;-- reading mode
           mov a,p1
           anl a,#0fh ;-- take last 4 bits only 
           mov r2,a ;-- store the nibble in register r2 
           ret 
-          
+     
+;--------------------------------------packnibble---------------------------------------------     
 packnibble: 
           push acc
           mov r0,50h ;
@@ -135,7 +135,8 @@ packnibble:
           mov 4fh,a
           pop acc
           ret 
-          
+       
+;--------------------------------------readvalues---------------------------------------------   
 readvalues: 
           mov r0,50h
           mov r1,51h 
@@ -143,11 +144,12 @@ readvalues:
               lcall packnibbles
               mov @r1,4fh 
               lcall delay_5s
-              ;--value has been read on lcd 
+              lcall lcdwrite
               inc r1
               djnz r0,loop 
               ret
-              
+ 
+;--------------------------------------displaymode---------------------------------------------             
 displaymode:
               lcall lcd_init ;
               mov p1,#0fh
@@ -162,26 +164,27 @@ displaymode:
               mov r0,a 
               mov a,@r0 
               lcall bintoascii
-              ;-- show a on lcd
+              lcall lcdcommand
               lcall delay_5s 
               sjmp displaymode
     invalid:
-              ;--clear lcd 
+              lcall lcd_init 
               lcall delay_5s 
               sjmp displaymode
               ret 
 
+;--------------------------------------main---------------------------------------------
 main: 
           mov 50h,#3h
           mov 51h,#70h 
           lcall lcd_init
-          ;--lcd has been started
+          lcall lcdwrite
           lcall delay_1s
           lcall readvalues
           lcall delay_5s
-          ;--lcd values stored
+          lcall lcdwrite
           lcall delay_5s
-          ;--lcd display mode 
+          lcall lcdwrite
           lcall displaymode 
           fin: sjmp fin 
 end 
