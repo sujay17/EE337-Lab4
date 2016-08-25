@@ -10,7 +10,7 @@ ljmp main
 
 ORG 200H 
 
-;-------------------------writing to the LCD routine---------------------------------------
+;-------------------------writing to the LCD routine------------------------------------
 lcdwrite: mov a,#80h		 ;Put cursor on first row,5 column
 	  acall lcd_command	 ;send command to LCD
 	  acall delay
