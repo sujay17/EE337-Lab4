@@ -1,0 +1,3 @@
+git push origin master -- make the committs to the online repo 
+git add . -- add all files to stage 
+git commit -m "Message"
